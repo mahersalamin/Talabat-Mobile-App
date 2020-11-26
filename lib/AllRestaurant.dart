@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'Restaurant.dart';
@@ -33,7 +34,10 @@ class _AllResturantState extends State<AllResturant> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar( title:Text('ResturantPage')),
+      appBar: AppBar(
+        title:Text('Restaurants Page'),
+        centerTitle: true,
+      ),
       body: Column(
         children: [
           FutureBuilder(
@@ -45,21 +49,33 @@ class _AllResturantState extends State<AllResturant> {
                   itemCount: snapshot.data.length,
                   itemBuilder: (BuildContext context, int index){
                     return Container(
+                      alignment: Alignment.center,
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Card(
+
                             child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                Image.network('http://appback.ppu.edu/static/${snapshot.data[index].restImage}'),
+
+                                Image.network(
+                                    'http://appback.ppu.edu/static/${snapshot.data[index].restImage}',
+                                    width: MediaQuery.of(context).size.width/1.1,
+                                    fit:BoxFit.cover),
                                 Text(snapshot.data[index].restName),
                                 Row(
                                   children: [
                                     Icon(
                                       Icons.location_on,
-                                      color: Colors.blueGrey,
+                                      color: Colors.green[600],
                                       size: 20.0,
                                     ),
                                     Text(snapshot.data[index].restCity),
+                                    Icon(
+                                        snapshot.data[index].restRate > 0 ? Icons.star : Icons.star_border)
                                   ],
                                 ),
                               ],
