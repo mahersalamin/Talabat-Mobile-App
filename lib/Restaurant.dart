@@ -21,7 +21,7 @@ class Restaurant {
       restPhone: json['phone'] as String,
       restRate: json['rating'] as int,
       restLat: json['lat'] as String,
-      restLng: json['lng'] as String
+      restLng: json['lng'] as String,
     );
   }
   @override
