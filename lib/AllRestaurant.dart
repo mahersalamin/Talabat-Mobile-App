@@ -1,4 +1,6 @@
+import 'package:mytalabat_app/RestaurantMenu.dart';
 
+import 'RatingStars.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'Restaurant.dart';
@@ -10,6 +12,7 @@ class AllResturant extends StatefulWidget {
 }
 
 class _AllResturantState extends State<AllResturant> {
+
   Future<List<Restaurant>> _restaurants;
 
   Future<List<Restaurant>> fetchRest() async {
@@ -29,6 +32,7 @@ class _AllResturantState extends State<AllResturant> {
   void initState() {
     super.initState();
     _restaurants = fetchRest();
+
   }
 
   @override
@@ -54,32 +58,40 @@ class _AllResturantState extends State<AllResturant> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Card(
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => RestaurantMenu(snapshot.data[index])));
+                            },
+                            child: Card(
 
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
 
-                                Image.network(
-                                    'http://appback.ppu.edu/static/${snapshot.data[index].restImage}',
-                                    width: MediaQuery.of(context).size.width/1.1,
-                                    fit:BoxFit.cover),
-                                Text(snapshot.data[index].restName),
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.location_on,
-                                      color: Colors.green[600],
-                                      size: 20.0,
-                                    ),
-                                    Text(snapshot.data[index].restCity),
-                                    Icon(
-                                        snapshot.data[index].restRate > 0 ? Icons.star : Icons.star_border)
-                                  ],
-                                ),
-                              ],
+                                  Image.network(
+                                      'http://appback.ppu.edu/static/${snapshot.data[index].restImage}',
+                                      width: MediaQuery.of(context).size.width/1.1,
+                                      fit:BoxFit.cover
+                                  ),
+                                  Text(snapshot.data[index].restName),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.location_on,
+                                        color: Colors.green[600],
+                                        size: 20.0,
+                                      ),
+                                      Text(snapshot.data[index].restCity),
+                                      Icon(
+                                        snapshot.data[index].restRate > 0 ? Icons.star : Icons.star_border,
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
+                            
                           )
                         ],
                       ),
