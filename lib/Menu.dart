@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'Restaurant.dart';
 class Menu{
   int menuId;
   int restId;
@@ -19,7 +17,7 @@ class Menu{
       menuDesc: json['descr'] as String,
       menuPrice: json['price'] as int,
       menuImage: json['image'] as String,
-      menuRating: int.parse(json['rate'].toString())
+      menuRating: json['rating'] as int
     );
   }
 
