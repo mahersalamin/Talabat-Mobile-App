@@ -15,7 +15,7 @@ class _AllResturantState extends State<AllResturant> {
 
   Future<List<Restaurant>> fetchRest() async {
     http.Response response =
-        await http.get('http://appback.ppu.edu/restaurants');
+    await http.get('http://appback.ppu.edu/restaurants');
     List<Restaurant> _restaurant = [];
 
     if (response.statusCode == 200) {
@@ -48,9 +48,10 @@ class _AllResturantState extends State<AllResturant> {
                 if (snapshot.hasData) {
                   return Expanded(
                     child: GridView.builder(
+                      shrinkWrap: true,
                       itemCount: snapshot.data.length,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
+                        crossAxisCount: 2,
                       ),
                       itemBuilder: (BuildContext context, int index) {
                         return Container(
@@ -58,23 +59,32 @@ class _AllResturantState extends State<AllResturant> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => RestaurantMenu(snapshot.data[index])));
-                                },
-                                child: Card(
+                              Card(
+                                child: Container(
+                                  color: Colors.grey[200],
                                   child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                    CrossAxisAlignment.center,
                                     mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
+                                    MainAxisAlignment.spaceEvenly,
                                     children: [
-                                      Image.network('http://appback.ppu.edu/static/${snapshot.data[index].restImage}',
-                                          width: MediaQuery.of(context).size.width / 3,
-                                          fit: BoxFit.cover),
+                                      Stack(
+                                        children: [
+                                          Container(
+                                            child: Image.network('http://appback.ppu.edu/static/${snapshot.data[index].restImage}',
+                                              width: MediaQuery.of(context).size.width / 2.11,
+                                              fit: BoxFit.cover,
+                                              height: 90,
+                                            ),
+                                          ),
+                                          Container(
+                                            child:Text(snapshot.data[index].restName, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 21.0),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                       Column(
                                         children: [
-                                          Text(snapshot.data[index].restName),
                                           Row(
                                             children: [
                                               Icon(
@@ -90,6 +100,29 @@ class _AllResturantState extends State<AllResturant> {
                                               snapshot.data[index].restRate)
                                         ],
                                       ),
+                                      Row(
+                                        children: [
+                                          MaterialButton(
+                                            color: Colors.amber,
+                                            padding: EdgeInsets.all(16),
+                                            shape: CircleBorder(),
+                                            textColor: Colors.white,
+                                            child: Icon(Icons.menu),
+                                            onPressed: (){
+                                              Navigator.push(context, MaterialPageRoute(builder: (context) => RestaurantMenu(snapshot.data[index])));
+                                            },
+                                          ),
+                                          MaterialButton(
+                                            color: Colors.redAccent,
+                                            padding: EdgeInsets.all(16),
+                                            shape: CircleBorder(),
+                                            textColor: Colors.white,
+                                            child: Icon(Icons.rate_review),
+                                            onPressed: (){
+                                            },
+                                          )
+                                        ],
+                                      )
                                     ],
                                   ),
                                 ),
