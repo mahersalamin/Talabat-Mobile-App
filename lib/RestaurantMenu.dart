@@ -1,5 +1,4 @@
 import 'package:mytalabat_app/FavouriteModel.dart';
-import 'package:mytalabat_app/testsss.dart';
 import 'package:provider/provider.dart';
 import 'Menu.dart';
 import 'package:flutter/material.dart';
@@ -58,7 +57,7 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
             icon:Icon(Icons.favorite),
             color: Colors.red,
             onPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => testwidget()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => FavPage()));
             },
           ),
 

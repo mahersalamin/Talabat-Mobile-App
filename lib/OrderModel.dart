@@ -10,8 +10,8 @@ class OrderModel extends ChangeNotifier{
     list.add(menu);
     notifyListeners();
   }
-  void remove (Menu menu){
-    list.remove(menu);
+  void remove (index){
+    list.removeAt(index);
     notifyListeners();
   }
   void removeEverything (Menu menu){

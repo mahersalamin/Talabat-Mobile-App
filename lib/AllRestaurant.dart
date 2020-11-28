@@ -5,22 +5,43 @@ import 'package:http/http.dart' as http;
 import 'Restaurant.dart';
 import 'dart:convert';
 
+import 'orderList.dart';
+
 class AllResturant extends StatefulWidget {
   @override
   _AllResturantState createState() => _AllResturantState();
 }
 
 class _AllResturantState extends State<AllResturant> {
-  Future<List<Restaurant>> _restaurants;
 
-  Future<List<Restaurant>> fetchRest() async {
+  bool isCityChanged = true;
+  Future<List<Restaurant>> _restaurants;
+  List<String> cities;
+  List<int> rates=[1,2,3,4,5];
+
+  Future<List<Restaurant>> fetchRest(String query,int withCondition) async {
+
     http.Response response =
     await http.get('http://appback.ppu.edu/restaurants');
     List<Restaurant> _restaurant = [];
 
     if (response.statusCode == 200) {
+
       var jsonArray = jsonDecode(response.body) as List;
-      _restaurant = jsonArray.map((x) => Restaurant.fromJson(x)).toList();
+     switch(withCondition){
+
+       //all restaurant
+       case 1:  _restaurant = jsonArray.map((x) => Restaurant.fromJson(x)).toList();
+       break;
+
+       //list by city name
+       case 2:  _restaurant = jsonArray.map((x) => Restaurant.fromJson(x)).where((element) => element.restCity==query).toList();
+       break;
+
+       //list by rate
+       case 3:  _restaurant = jsonArray.map((x) => Restaurant.fromJson(x)).where((element) => (element.restRate~/2)==int.parse(query) ).toList();
+       break;
+     }
       return _restaurant;
     } else {
       throw Exception("Failed to load data ");
@@ -30,7 +51,7 @@ class _AllResturantState extends State<AllResturant> {
   @override
   void initState() {
     super.initState();
-    _restaurants = fetchRest();
+    _restaurants = fetchRest("",1);
   }
 
   @override
@@ -39,13 +60,25 @@ class _AllResturantState extends State<AllResturant> {
       appBar: AppBar(
         title: Text('Restaurants Page'),
         centerTitle: true,
+        actions: [
+          IconButton(icon: Icon(Icons.filter),
+              onPressed: (){
+                openFilterDialog();
+              }
+          )
+        ],
       ),
+
       body: Column(
         children: [
-          FutureBuilder(
+          FutureBuilder <List<Restaurant>>(
               future: _restaurants,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
+
+                  if(isCityChanged ){
+                    cities=snapshot.data.map((e) => e.restCity).toSet().toList();
+                  }
                   return Expanded(
                     child: GridView.builder(
                       shrinkWrap: true,
@@ -137,8 +170,95 @@ class _AllResturantState extends State<AllResturant> {
                   return Text("error ${snapshot.error}");
                 }
                 return Center(child: CircularProgressIndicator());
-              })
+              }),
+
         ],
+      ),
+      floatingActionButton:  FloatingActionButton(
+        child: Icon(Icons.add_shopping_cart),
+        onPressed: (){
+          Navigator.push(context, MaterialPageRoute(builder: (context) => orderingPage()));
+        },
+      ),
+    );
+
+  }
+
+  void openFilterDialog(){
+    showDialog(
+
+      context: context,
+      child: AlertDialog(
+      title: Text('Filter dialog'),
+      content: Container(
+        height: 200,
+        child: Column(
+          children: [
+            RaisedButton(
+              child: Text('all restaurants'),
+                onPressed: (){
+                isCityChanged=true;
+                  Navigator.of(context, rootNavigator: true).pop();
+              setState((){
+                this._restaurants=fetchRest("", 1);
+              });
+
+            }),
+           buildListOfCities(),
+           buildListOfStars(),
+
+          ],
+        ),
+      ),
+      actions: [
+        IconButton(icon: Icon(Icons.cancel), onPressed: (){
+          Navigator.of(context, rootNavigator: true).pop();
+        })
+      ],
+    ),);
+
+  }
+  Widget buildListOfStars(){
+    return Container(
+      height: 50,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          children: List.generate(rates.length,
+                  (index) => GestureDetector(
+                      child: Text('${rates[index]}', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),),
+                      onTap:(){
+                        setState(() {
+                          _restaurants=fetchRest(index.toString(), 3);
+                          Navigator.of(context, rootNavigator: true).pop();
+                        });
+                      } ,),
+                  //     Row(
+                  //   children: List.generate(rates[index], (index) => ),
+                  // )
+          ),
+        ),
+      ),
+    );
+  }
+  Widget buildListOfCities(){
+    isCityChanged=false;
+    return Container(
+      height: 50,
+      child: SingleChildScrollView(
+        child: Column(
+          children : List.generate(cities.length,
+                  (index) => ListTile(
+                    title: Text('${cities[index]}'),
+                    onTap: (){
+                      setState(() {
+                        this._restaurants=fetchRest(cities[index], 2);
+                      });
+                      Navigator.of(context, rootNavigator: true).pop();
+                    },
+
+          ))
+        ),
       ),
     );
   }
