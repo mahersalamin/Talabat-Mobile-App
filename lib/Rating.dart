@@ -4,11 +4,9 @@ import 'package:smooth_star_rating/smooth_star_rating.dart';
 class Rate extends StatelessWidget {
   final int value;
   Rate(this.value);
-
   @override
   Widget build(BuildContext context) {
     return SmoothStarRating(
-        allowHalfRating: true,
         onRated: (v) {
         },
         starCount: 5,
@@ -20,7 +18,6 @@ class Rate extends StatelessWidget {
         defaultIconData: Icons.star_border,
         color: Colors.green,
         borderColor: Colors.green,
-        spacing:0.0
     );
   }
 }

@@ -9,9 +9,7 @@ class StarDisplay extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: List.generate(5, (index) {
-        return Icon(
-          index < (value/2) ? Icons.star : Icons.star_border,
-        );
+        return Icon(index < (value/2) ? Icons.star : Icons.star_border);
       }),
     );
   }

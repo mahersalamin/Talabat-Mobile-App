@@ -1,10 +1,27 @@
+import 'package:provider/provider.dart';
+
 import 'Menu.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'Rating.dart';
+import 'RatingStars.dart';
 import 'Restaurant.dart';
+import 'favouritList.dart';
+import 'orderList.dart';
 
+class xxx extends ChangeNotifier{
+  List<Menu> favorit = [];
+
+  void addToFavList(Menu _favobj){
+    favorit.add(_favobj);
+    notifyListeners();
+  }
+
+  void removeFromFavList(int index){
+    favorit.removeAt(index);
+    notifyListeners();
+  }
+}
 
 class RestaurantMenu extends StatefulWidget {
   final Restaurant restaurant;
@@ -19,7 +36,7 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
 
   Future <List<Menu>> _menuList;
 
-
+  List<Menu> _favorit = [];
   Future<List<Menu>> fetchMenu() async {
     http.Response response = await http.get('http://appback.ppu.edu/menus/${restaurantMenu.restID}');
     List<Menu> _menus = [];
@@ -46,6 +63,16 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
       appBar: AppBar(
         title: Text(restaurantMenu.restName),
         centerTitle: true,
+        actions: <Widget>[
+          IconButton(
+            icon:Icon(Icons.favorite),
+            color: Colors.red,
+            onPressed: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context) => FavPage(_favorit)));
+            },
+          ),
+
+        ],
       ),
       body: Column(
         children: [
@@ -63,14 +90,9 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
                       size: 20.0,
                     ),
                     Text(restaurantMenu.restCity),
-                    Rate(restaurantMenu.restRate)
                   ],
                 ),
-                Column(
-                  children: [
-
-                  ],
-                )
+                Text('discription')
               ],
             ),
           ),
@@ -96,6 +118,33 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
                                 Text(snapshot.data[index].menuName.toString()),
                                 Text('Description '+snapshot.data[index].menuDesc.toString()),
                                 Text('Price '+ snapshot.data[index].menuPrice.toString()),
+                                StarDisplay(value: snapshot.data[index].menuRating),
+                                Row(
+                                  children: [
+                                    MaterialButton(
+                                      color: Colors.red,
+                                      child: Icon(Icons.favorite_border),
+                                      textColor: Colors.white,
+                                      shape: CircleBorder(),
+                                      padding: EdgeInsets.all(16),
+
+                                      onPressed: (){
+                                        Provider.of<xxx>(context).addToFavList(snapshot.data[index]);
+                                      },
+                                    ),
+                                    MaterialButton(
+                                      color: Colors.blue,
+                                      textColor: Colors.white,
+                                      child: Icon(Icons.add_shopping_cart_outlined),
+                                      shape: CircleBorder(),
+                                      padding: EdgeInsets.all(16),
+                                      onPressed: (){
+                                        Navigator.push(context, MaterialPageRoute(builder: (context) => orderingPage()));
+                                      },
+                                    )
+                                  ],
+                                )
+
                               ],
                             ),
                           ),
