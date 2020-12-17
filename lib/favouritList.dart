@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mytalabat_app/Menu.dart';
 import 'package:provider/provider.dart';
 import 'FavouriteModel.dart';
 
@@ -17,16 +16,19 @@ class _FavPageState extends State<FavPage> {
         appBar: AppBar(
           title: Text("Favorite List"),
         ),
-        body: Column(
-          children: [
-            Consumer<FavModel>(
-                builder: (context, todo  , child){
-                  return ListView.builder(
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    itemCount: todo.list.length,
-                    itemBuilder: (context , index){
-                      return ListTile(
+        body: Consumer<FavModel>(
+            builder: (context, todo  , child){
+              return ListView.builder(
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                itemCount: todo.list.length,
+                itemBuilder: (context , index){
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      color: Colors.brown[400],
+                      height: 80,
+                      child: ListTile(
                         leading: Image.network(
                             'http://appback.ppu.edu/static/${todo.list[index].menuImage}',
                             width: MediaQuery.of(context).size.width/3, fit:BoxFit.cover),
@@ -34,17 +36,17 @@ class _FavPageState extends State<FavPage> {
                         subtitle: Text(todo.list[index].menuPrice.toString()),
                         trailing: IconButton(
                             icon:Icon(Icons.delete_forever),
-                            color: Colors.red,
+                            color: Colors.white,
                             onPressed: (){
                               Provider.of<FavModel>(context, listen: false).remove(index);
                             }
                         ),
-                      );
-                    },
+                      ),
+                    ),
                   );
-                }
-            )
-          ],
+                },
+              );
+            }
         )
     );
   }

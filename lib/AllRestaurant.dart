@@ -3,8 +3,8 @@ import 'RatingStars.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'Restaurant.dart';
+import 'package:toast/toast.dart';
 import 'dart:convert';
-
 import 'orderList.dart';
 
 class AllResturant extends StatefulWidget {
@@ -34,11 +34,11 @@ class _AllResturantState extends State<AllResturant> {
        case 1:  _restaurant = jsonArray.map((x) => Restaurant.fromJson(x)).toList();
        break;
 
-       //list by city name
+       //list restaurant by city name
        case 2:  _restaurant = jsonArray.map((x) => Restaurant.fromJson(x)).where((element) => element.restCity==query).toList();
        break;
 
-       //list by rate
+       //list restaurant by rate
        case 3:  _restaurant = jsonArray.map((x) => Restaurant.fromJson(x)).where((element) => (element.restRate~/2)==int.parse(query) ).toList();
        break;
      }
@@ -81,8 +81,12 @@ class _AllResturantState extends State<AllResturant> {
                   }
                   return Expanded(
                     child: GridView.builder(
+                      // making 2D array to view all restaurant cards
+                      // as a grid of two columns
                       shrinkWrap: true,
                       itemCount: snapshot.data.length,
+
+                      // number of columns
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
                       ),
@@ -111,7 +115,15 @@ class _AllResturantState extends State<AllResturant> {
                                             ),
                                           ),
                                           Container(
-                                            child:Text(snapshot.data[index].restName, style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 21.0),
+                                            child:
+                                            Text(
+                                              snapshot.data[index].restName,
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 21.0,
+                                                  backgroundColor: Colors.grey,
+                                              ),
                                             ),
                                           ),
                                         ],
@@ -166,7 +178,13 @@ class _AllResturantState extends State<AllResturant> {
                       },
                     ),
                   );
-                } else if (snapshot.hasError) {
+                } else if (snapshot.hasData==null) {
+                   Toast.show(
+                       "We are sorry. it looks like there are no data in the server",
+                       context,duration: Toast.LENGTH_SHORT,
+                       gravity: Toast.CENTER) ;
+                }
+                else if (snapshot.hasError) {
                   return Text("error ${snapshot.error}");
                 }
                 return Center(child: CircularProgressIndicator());
@@ -175,7 +193,9 @@ class _AllResturantState extends State<AllResturant> {
         ],
       ),
       floatingActionButton:  FloatingActionButton(
-        child: Icon(Icons.add_shopping_cart),
+        backgroundColor: Colors.green,
+
+        child: Icon(Icons.shopping_cart),
         onPressed: (){
           Navigator.push(context, MaterialPageRoute(builder: (context) => orderingPage()));
         },
@@ -189,12 +209,16 @@ class _AllResturantState extends State<AllResturant> {
 
       context: context,
       child: AlertDialog(
-      title: Text('Filter dialog'),
+      title: Text('Filter restaurants '),
       content: Container(
-        height: 200,
+        height: 250,
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Text('View all restaurant'),
             RaisedButton(
+
               child: Text('all restaurants'),
                 onPressed: (){
                 isCityChanged=true;
@@ -204,7 +228,9 @@ class _AllResturantState extends State<AllResturant> {
               });
 
             }),
+           Text('View by city'),
            buildListOfCities(),
+            Text('View by rating'),
            buildListOfStars(),
 
           ],

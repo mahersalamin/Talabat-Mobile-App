@@ -1,3 +1,4 @@
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mytalabat_app/FavouriteModel.dart';
 import 'package:provider/provider.dart';
 import 'Menu.dart';
@@ -11,7 +12,6 @@ import 'favouritList.dart';
 import 'orderList.dart';
 
 
-
 class RestaurantMenu extends StatefulWidget {
   final Restaurant restaurant;
   RestaurantMenu(this.restaurant);
@@ -20,12 +20,13 @@ class RestaurantMenu extends StatefulWidget {
 }
 
 class _RestaurantMenuState extends State<RestaurantMenu> {
+
+  List<Marker> allMarkers=[];
   Restaurant restaurantMenu;
   _RestaurantMenuState(this.restaurantMenu);
 
   Future <List<Menu>> _menuList;
 
-  List<Menu> _favorit = [];
   Future<List<Menu>> fetchMenu() async {
     http.Response response = await http.get('http://appback.ppu.edu/menus/${restaurantMenu.restID}');
     List<Menu> _menus = [];
@@ -44,10 +45,17 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
   void initState() {
     super.initState();
     _menuList = fetchMenu();
+    allMarkers.add(Marker(markerId: MarkerId('myMarker'),draggable:false,
+        onTap:(){
+          print('Marker is tapped');
+        },
+        position:LatLng( double.parse('${restaurantMenu.restLat}'), double.parse('${restaurantMenu.restLng}'))
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: Text(restaurantMenu.restName),
@@ -63,41 +71,35 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
 
         ],
       ),
+
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Card(
+            child: Container(
+              height:240,
+              width: MediaQuery.of(context).size.width,
               color: Colors.grey[200],
-              child:Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Image.network('http://appback.ppu.edu/static/${restaurantMenu.restImage}',
-                      width: MediaQuery.of(context).size.width / 2.5,
-                      fit: BoxFit.cover),
-                  Column(
-                    children: [
-                      Icon(
-                        Icons.location_on,
-                        color: Colors.green[600],
-                        size: 20.0,
-                      ),
-                      Text(restaurantMenu.restCity),
-                    ],
-                  ),
-                  Text('discription')
-                ],
+              child:GoogleMap(
+                initialCameraPosition: CameraPosition(
+                    target: LatLng( double.parse('${restaurantMenu.restLat}'), double.parse('${restaurantMenu.restLng}')),
+                    zoom: 14.0
+                ),
+                markers: Set.from(allMarkers),
               ),
             ),
           ),
+
           FutureBuilder(
               future: _menuList,
               builder: (context,snapshot){
+
                 if(snapshot.hasData){
                   return Expanded(
                     child: ListView.builder(
                       itemCount: snapshot.data.length,
                       itemBuilder: (BuildContext context,int index){
+                        bool isSaved= true;
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
@@ -114,8 +116,8 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
                                       fit:BoxFit.cover
                                   ),
                                   Text(snapshot.data[index].menuName.toString()),
-                                  Text('Description '+snapshot.data[index].menuDesc.toString()),
-                                  Text('Price '+ snapshot.data[index].menuPrice.toString()),
+                                  Text('\nDescription '+snapshot.data[index].menuDesc.toString()),
+                                  Text('\nPrice '+ snapshot.data[index].menuPrice.toString()),
                                   StarDisplay(value: snapshot.data[index].menuRating),
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -124,14 +126,20 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
                                       children: [
                                         MaterialButton(
                                           color: Colors.red,
-                                          child: Icon(Icons.favorite_border),
+                                          child: Icon(isSaved?Icons.favorite_border: Icons.favorite,
+                                            color:isSaved?Colors.white: null,),
                                           textColor: Colors.white,
                                           shape: CircleBorder(),
                                           padding: EdgeInsets.all(16),
+                                          onPressed: () {
+                                            if (isSaved) {
+                                              setState(() {
+                                                Provider.of<FavModel>(context, listen: false).add(snapshot.data[index]);
+                                                isSaved=!isSaved;
+                                              });
 
-                                          onPressed: (){
-                                            Provider.of<FavModel>(context, listen: false).add(snapshot.data[index]);
-                                          },
+                                            }
+                                          }
                                         ),
                                         MaterialButton(
                                           color: Colors.blue,

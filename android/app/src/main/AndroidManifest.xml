@@ -7,8 +7,12 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="mytalabat_app"
+        android:label="طلباتي - My Talabat"
         android:icon="@mipmap/ic_launcher">
+
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAiDccyRj7t9YT7ArKrC5Rvt-h8Uc8bSik"/>
+
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

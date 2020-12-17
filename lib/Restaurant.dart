@@ -1,4 +1,3 @@
-import 'dart:convert';
 class Restaurant {
   int restID;
   String restName;
