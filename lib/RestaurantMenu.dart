@@ -1,6 +1,7 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mytalabat_app/FavouriteModel.dart';
 import 'package:provider/provider.dart';
+import 'package:toast/toast.dart';
 import 'Menu.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -99,7 +100,7 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
                     child: ListView.builder(
                       itemCount: snapshot.data.length,
                       itemBuilder: (BuildContext context,int index){
-                        bool isSaved= true;
+                        bool isSaved= false;
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
@@ -126,19 +127,21 @@ class _RestaurantMenuState extends State<RestaurantMenu> {
                                       children: [
                                         MaterialButton(
                                           color: Colors.red,
-                                          child: Icon(isSaved?Icons.favorite_border: Icons.favorite,
-                                            color:isSaved?Colors.white: null,),
+                                          child: Icon(isSaved?Icons.favorite: Icons.favorite_border,
+                                            color:Colors.white),
                                           textColor: Colors.white,
                                           shape: CircleBorder(),
                                           padding: EdgeInsets.all(16),
                                           onPressed: () {
-                                            if (isSaved) {
-                                              setState(() {
-                                                Provider.of<FavModel>(context, listen: false).add(snapshot.data[index]);
-                                                isSaved=!isSaved;
-                                              });
-
+                                            if(isSaved==false){
+                                              Provider.of<FavModel>(context, listen: false).add(snapshot.data[index]);
+                                              isSaved=!isSaved;
                                             }
+                                            else if(isSaved==true){
+                                            Provider.of<FavModel>(context, listen: false).remove(snapshot.data[index]);
+                                            isSaved=!isSaved;
+                                            }
+
                                           }
                                         ),
                                         MaterialButton(
